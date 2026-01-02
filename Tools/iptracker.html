@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>IP Tracker | Quantum Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #141e30, #243b55);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 22px;
+      padding: 30px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      animation: fadeUp 1s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-bottom: 25px;
+    }
+
+    .input-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .result {
+      display: none;
+      animation: fadeUp 0.8s ease;
+    }
+
+    .flag {
+      width: 64px;
+      display: block;
+      margin: 0 auto 15px;
+    }
+
+    .data {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .map {
+      display: block;
+      margin-top: 15px;
+      text-align: center;
+      padding: 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00ffcc, #00c3ff);
+      color: #000;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>📡 IP Tracker</h1>
+    <div class="subtitle">Lacak lokasi IP address secara instan</div>
+
+    <div class="input-box">
+      <input type="text" id="ip" placeholder="Masukkan IP Address">
+      <button onclick="trackIP()">Lacak</button>
+    </div>
+
+    <div class="result" id="result">
+      <img id="flag" class="flag">
+
+      <div class="data"><b>IP:</b> <span id="rip"></span></div>
+      <div class="data"><b>Negara:</b> <span id="country"></span></div>
+      <div class="data"><b>Kota:</b> <span id="city"></span></div>
+      <div class="data"><b>Ibu Kota:</b> <span id="capital"></span></div>
+      <div class="data"><b>ISP:</b> <span id="isp"></span></div>
+      <div class="data"><b>Organisasi:</b> <span id="org"></span></div>
+      <div class="data"><b>Koordinat:</b> <span id="lat"></span>, <span id="lon"></span></div>
+
+      <a id="maps" class="map" target="_blank">📍 Buka di Google Maps</a>
+    </div>
+
+    <div class="footer">
+      Quantum IP Tracker • Powered by Pahri
+    </div>
+  </div>
+
+  <script>
+    async function trackIP() {
+      const ip = document.getElementById("ip").value.trim();
+      if (!ip) return alert("Masukkan IP Address!");
+
+      const api = "https://api-faa.my.id/faa/track-ip?ip=" + ip;
+
+      try {
+        const res = await fetch(api);
+        const data = await res.json();
+
+        if (!data.status) return alert("IP tidak ditemukan!");
+
+        document.getElementById("flag").src = data.bendera;
+        document.getElementById("rip").innerText = data.ip;
+        document.getElementById("country").innerText = data.negara + " (" + data.kode_negara + ")";
+        document.getElementById("city").innerText = data.kota;
+        document.getElementById("capital").innerText = data.ibu_kota;
+        document.getElementById("isp").innerText = data.isp;
+        document.getElementById("org").innerText = data.organisasi;
+        document.getElementById("lat").innerText = data.latitude;
+        document.getElementById("lon").innerText = data.longitude;
+        document.getElementById("maps").href = data.google_maps;
+
+        document.getElementById("result").style.display = "block";
+      } catch (e) {
+        alert("Terjadi kesalahan API!");
+      }
+    }
+  </script>
+
+</body>
+</html>

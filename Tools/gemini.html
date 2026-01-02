@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Gemini AI Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+}
+.chat-box{
+  width:100%;
+  max-width:480px;
+  height:90vh;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(14px);
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 20px 50px rgba(0,0,0,.6);
+}
+.header{
+  padding:16px;
+  text-align:center;
+  font-weight:600;
+  background:rgba(255,255,255,.05);
+}
+.header span{
+  font-size:.8rem;
+  opacity:.8;
+}
+.messages{
+  flex:1;
+  padding:15px;
+  overflow-y:auto;
+}
+.msg{
+  max-width:80%;
+  padding:10px 14px;
+  border-radius:14px;
+  margin-bottom:10px;
+  line-height:1.5;
+  animation:fade .3s ease;
+  white-space:pre-wrap;
+}
+.user{
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  margin-left:auto;
+  color:#000;
+}
+.bot{
+  background:rgba(255,255,255,.12);
+}
+.input-area{
+  display:flex;
+  padding:12px;
+  gap:10px;
+  background:rgba(0,0,0,.35);
+}
+input{
+  flex:1;
+  border:none;
+  outline:none;
+  padding:12px;
+  border-radius:12px;
+  font-size:.9rem;
+}
+button{
+  border:none;
+  padding:0 18px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:600;
+  background:linear-gradient(135deg,#1ed760,#1db954);
+  color:#000;
+}
+button:hover{
+  opacity:.9;
+}
+@keyframes fade{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-box">
+  <div class="header">
+    🤖 Gemini AI Chat<br>
+    <span>Selalu menjawab Bahasa Indonesia</span>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="msg bot">
+      Halo 👋<br>
+      Silakan tanya apa saja.
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input id="input" placeholder="Ketik pertanyaan..." onkeydown="if(event.key==='Enter')send()">
+    <button onclick="send()">Kirim</button>
+  </div>
+</div>
+
+<script>
+async function send(){
+  const input = document.getElementById("input");
+  const text = input.value.trim();
+  if(!text) return;
+
+  const messages = document.getElementById("messages");
+
+  // pesan user
+  messages.innerHTML += `<div class="msg user">${text}</div>`;
+  input.value="";
+  messages.scrollTop = messages.scrollHeight;
+
+  // loading
+  const id="bot-"+Date.now();
+  messages.innerHTML += `<div class="msg bot" id="${id}">⏳ Gemini sedang mengetik...</div>`;
+  messages.scrollTop = messages.scrollHeight;
+
+  try{
+    const prompt =
+      "Jawab selalu menggunakan Bahasa Indonesia.\n\nPertanyaan:\n" + text;
+
+    const api =
+      "https://api-faa.my.id/faa/gemini-ai?text=" +
+      encodeURIComponent(prompt);
+
+    const res = await fetch(api);
+    const data = await res.json();
+
+    document.getElementById(id).innerText =
+      data.status ? data.result : "❌ Gagal mendapatkan jawaban";
+
+  }catch(e){
+    document.getElementById(id).innerText =
+      "❌ Terjadi kesalahan koneksi";
+  }
+
+  messages.scrollTop = messages.scrollHeight;
+}
+</script>
+
+</body>
+</html>

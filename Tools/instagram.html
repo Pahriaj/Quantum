@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Instagram Downloader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- ICON -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 550px;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(15px);
+      border-radius: 22px;
+      padding: 30px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      animation: fadeUp 1s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-bottom: 25px;
+    }
+
+    .input-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ff512f, #dd2476);
+      color: #fff;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    }
+
+    .result {
+      display: none;
+      animation: fadeUp 0.8s ease;
+    }
+
+    .meta {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .downloads a {
+      display: block;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00ffcc, #00c3ff);
+      color: #000;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .downloads a:hover {
+      transform: scale(1.03);
+    }
+
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>📸 Instagram Downloader</h1>
+    <div class="subtitle">Download video Instagram tanpa ribet</div>
+
+    <div class="input-box">
+      <input type="text" id="url" placeholder="Masukkan link Instagram">
+      <button onclick="downloadIG()">Download</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="meta"><b>Username:</b> <span id="username"></span></div>
+      <div class="meta"><b>Caption:</b> <span id="caption"></span></div>
+      <div class="meta"><b>Like:</b> ❤️ <span id="like"></span> | 💬 <span id="comment"></span></div>
+
+      <div class="downloads" id="downloads"></div>
+    </div>
+
+    <div class="footer">
+      Quantum IG Downloader • Powered by Pahri
+    </div>
+  </div>
+
+  <script>
+    async function downloadIG() {
+      const url = document.getElementById("url").value.trim();
+      if (!url) return alert("Masukkan URL Instagram!");
+
+      const api = "https://api-faa.my.id/faa/igdl?url=" + encodeURIComponent(url);
+
+      try {
+        const res = await fetch(api);
+        const data = await res.json();
+
+        if (!data.status) return alert("Gagal mengambil data!");
+
+        const meta = data.result.metadata;
+
+        document.getElementById("username").innerText = meta.username;
+        document.getElementById("caption").innerText = meta.caption || "-";
+        document.getElementById("like").innerText = meta.like;
+        document.getElementById("comment").innerText = meta.comment;
+
+        const downloads = document.getElementById("downloads");
+        downloads.innerHTML = "";
+
+        data.result.url.forEach((link, i) => {
+          const a = document.createElement("a");
+          a.href = link;
+          a.target = "_blank";
+          a.innerHTML = "⬇️ Download Video " + (i + 1);
+          downloads.appendChild(a);
+        });
+
+        document.getElementById("result").style.display = "block";
+
+      } catch (err) {
+        alert("Terjadi kesalahan API!");
+      }
+    }
+  </script>
+
+</body>
+</html>

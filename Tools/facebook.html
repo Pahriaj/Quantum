@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facebook Downloader</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 25px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 40px rgba(0,0,0,.45);
+      animation: fadeUp .8s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: .9rem;
+      opacity: .85;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1877f2, #0f5fd6);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .3s ease;
+      margin-bottom: 12px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,.4);
+    }
+
+    .result {
+      margin-top: 18px;
+      background: rgba(0,0,0,.35);
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      width: 100%;
+    }
+
+    .result img {
+      width: 100%;
+      border-radius: 12px;
+      margin: 10px 0;
+    }
+
+    .links {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .links a {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 600;
+      transition: .3s;
+    }
+
+    .links a.sd {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    .links a.hd {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .links a:hover {
+      transform: scale(1.03);
+    }
+
+    .error {
+      color: #f87171;
+      font-weight: 600;
+    }
+
+    .footer {
+      margin-top: 12px;
+      font-size: 12px;
+      opacity: 0.7;
+      text-align: center;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media(max-width: 420px) {
+      .links {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>📘 Facebook Downloader</h1>
+    <p class="subtitle">Download video Facebook STANDAR & HD</p>
+
+    <input type="text" id="fburl" placeholder="Masukkan link video Facebook..." />
+    <button onclick="downloadFB()">Download</button>
+
+    <div class="result" id="result"></div>
+
+    <!-- Footer selalu di bawah hasil -->
+    <div class="footer">
+      Quantum Facebook Downloader • Powered by Pahri
+    </div>
+  </div>
+
+  <script>
+    async function downloadFB() {
+      const url = document.getElementById('fburl').value.trim();
+      const resultBox = document.getElementById('result');
+
+      if (!url) {
+        resultBox.innerHTML = '<span class="error">❌ Masukkan URL Facebook terlebih dahulu</span>';
+        return;
+      }
+
+      resultBox.innerHTML = '⏳ Mengambil data...';
+
+      try {
+        const res = await fetch(`https://api-faa.my.id/faa/fbdownload?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+
+        if (!data.status) {
+          resultBox.innerHTML = '<span class="error">❌ Gagal mengambil data</span>';
+          return;
+        }
+
+        const info = data.result.info;
+        const media = data.result.media;
+
+        resultBox.innerHTML = `
+          <b>Judul:</b> ${info.title}<br>
+          <b>Durasi:</b> ${info.duration} ms<br><br>
+
+          <img src="${media.thumbnail}" alt="thumbnail">
+
+          <div class="links">
+            <a class="sd" href="${media.video_sd}" target="_blank">⬇ STANDAR</a>
+            <a class="hd" href="${media.video_hd}" target="_blank">⬇ HD</a>
+          </div>
+        `;
+      } catch (e) {
+        resultBox.innerHTML = '<span class="error">❌ Error: ' + e.message + '</span>';
+      }
+    }
+  </script>
+</body>
+</html>

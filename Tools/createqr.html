@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create QR Code</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; font-family:'Poppins',sans-serif; }
+    body {
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: linear-gradient(135deg,#1e3c72,#2a5298);
+      color:#fff;
+      padding:20px;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+      padding:30px;
+      border-radius:20px;
+      max-width:400px;
+      width:100%;
+      text-align:center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      animation: fadeUp .8s ease;
+    }
+    h1 { margin-bottom:10px; font-size:1.8rem; }
+    input[type=text] {
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      border:none;
+      outline:none;
+      margin:15px 0;
+      font-size:14px;
+    }
+    button {
+      padding:14px;
+      width:100%;
+      border:none;
+      border-radius:12px;
+      background: linear-gradient(135deg,#00c6ff,#0072ff);
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
+      transition:0.3s;
+    }
+    button:hover { transform:translateY(-2px); box-shadow:0 10px 25px rgba(0,0,0,0.4); }
+
+    .result {
+      margin-top:20px;
+      background: rgba(0,0,0,0.2);
+      padding:15px;
+      border-radius:14px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .result img { width:200px; height:200px; border-radius:12px; margin-bottom:10px; }
+    .result a {
+      padding:10px 18px;
+      border-radius:10px;
+      text-decoration:none;
+      color:#fff;
+      font-weight:600;
+      background: linear-gradient(135deg,#22c55e,#16a34a);
+      transition:0.3s;
+      margin-bottom:10px;
+    }
+    .result a:hover { transform: scale(1.05); }
+
+    .powered {
+      font-size:12px;
+      opacity:0.7;
+      text-align:center;
+      margin-top:5px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🖲 Create QR Code</h1>
+    <input type="text" id="qrText" placeholder="Masukkan teks atau URL...">
+    <button onclick="generateQR()">Buat QR Code</button>
+    
+    <div class="result" id="result">
+      <!-- QR muncul di sini -->
+      <div class="powered">Quantum Create QR • Powered by Pahri</div>
+    </div>
+  </div>
+
+  <script>
+    async function generateQR() {
+      const text = document.getElementById('qrText').value.trim();
+      const resultBox = document.getElementById('result');
+
+      if(!text) {
+        resultBox.innerHTML = "<div class='powered'>❌ Masukkan teks atau URL!</div>";
+        return;
+      }
+
+      resultBox.innerHTML = "<div class='powered'>⏳ Membuat QR...</div>";
+
+      try {
+        const res = await fetch(`https://api-faa.my.id/faa/qr-create?text=${encodeURIComponent(text)}`);
+        if(!res.ok) throw new Error("Gagal mengambil QR");
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        resultBox.innerHTML = `<img src="${url}" alt="QR Code">
+                               <a href="${url}" target="_blank" download="qr.png">⬇ Download QR</a>
+                               <div class="powered">Quantum Create QR • Powered by Pahri</div>`;
+      } catch(err) {
+        resultBox.innerHTML = `<div class='powered'>❌ Error: ${err.message}</div>`;
+      }
+    }
+  </script>
+
+</body>
+</html>

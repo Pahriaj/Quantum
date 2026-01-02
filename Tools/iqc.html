@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>iPhone Quote Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+  padding:20px;
+}
+.box{
+  width:100%;
+  max-width:520px;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(15px);
+  border-radius:22px;
+  padding:30px;
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
+  animation:fadeUp .8s ease;
+}
+h1{
+  text-align:center;
+  margin-bottom:8px;
+}
+.subtitle{
+  text-align:center;
+  font-size:.9rem;
+  opacity:.85;
+  margin-bottom:25px;
+}
+label{
+  font-size:.8rem;
+  opacity:.85;
+}
+input, textarea{
+  width:100%;
+  padding:13px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+  font-size:.9rem;
+  margin-bottom:15px;
+}
+textarea{
+  resize:none;
+  height:100px;
+}
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-weight:700;
+  cursor:pointer;
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  color:#000;
+  transition:.3s;
+}
+button:hover{
+  transform:scale(1.03);
+}
+.result{
+  display:none;
+  margin-top:20px;
+  animation:fadeUp .6s ease;
+}
+.result img{
+  width:100%;
+  border-radius:16px;
+  margin-bottom:12px;
+}
+.download{
+  display:block;
+  text-align:center;
+  padding:12px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#1ed760,#1db954);
+  color:#000;
+  font-weight:700;
+  text-decoration:none;
+}
+.footer{
+  margin-top:15px;
+  text-align:center;
+  font-size:.75rem;
+  opacity:.7;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(25px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h1>📱 iPhone Quote Chat</h1>
+  <div class="subtitle">
+    Generator chat quote ala iPhone
+  </div>
+
+  <label>Quote / Pesan</label>
+  <textarea id="prompt" placeholder="Masukkan teks chat iPhone..."></textarea>
+
+  <label>Jam (contoh: 09:41)</label>
+  <input id="jam" placeholder="09:41">
+
+  <label>Baterai (%)</label>
+  <input id="batre" placeholder="85">
+
+  <button onclick="generate()">🎨 Buat Quote</button>
+
+  <div class="result" id="result">
+    <img id="img">
+    <a id="download" class="download" target="_blank">⬇️ Download Gambar</a>
+  </div>
+
+  <div class="footer">
+    Quantum Iphone Quote Chat • Powered by Pahri
+  </div>
+</div>
+
+<script>
+async function generate(){
+  const prompt = document.getElementById("prompt").value.trim();
+  const jam = document.getElementById("jam").value.trim();
+  const batre = document.getElementById("batre").value.trim();
+
+  if(!prompt || !jam || !batre){
+    alert("Semua field wajib diisi!");
+    return;
+  }
+
+  const api =
+    "https://api-faa.my.id/faa/iqcv2?" +
+    "prompt=" + encodeURIComponent(prompt) +
+    "&jam=" + encodeURIComponent(jam) +
+    "&batre=" + encodeURIComponent(batre);
+
+  try{
+    const res = await fetch(api);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    document.getElementById("img").src = url;
+    document.getElementById("download").href = url;
+    document.getElementById("result").style.display = "block";
+
+  }catch{
+    alert("Gagal membuat gambar");
+  }
+}
+</script>
+
+</body>
+</html>

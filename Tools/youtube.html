@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Downloader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ff0000, #1c1c1c);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .box {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(15px);
+      border-radius: 22px;
+      padding: 30px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      animation: fadeUp 1s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.9rem;
+      margin-bottom: 8px;
+    }
+
+    .desc {
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-bottom: 25px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 14px 22px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ff4b2b, #ff416c);
+      color: #fff;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    }
+
+    .result {
+      display: none;
+      animation: fadeUp 0.8s ease;
+    }
+
+    .download-box {
+      background: rgba(255,255,255,0.08);
+      border-radius: 15px;
+      padding: 18px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .download-box h3 {
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .download-btn {
+      display: block;
+      padding: 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    .video {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+    }
+
+    .audio {
+      background: linear-gradient(135deg, #42e695, #3bb2b8);
+      color: #000;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>▶️ YouTube Downloader</h1>
+    <div class="desc">
+      Download video / suara YouTube
+    </div>
+
+    <div class="input-group">
+      <input type="text" id="ytUrl" placeholder="Masukkan YouTube URL">
+      <button onclick="downloadYT()">Download</button>
+    </div>
+
+    <div class="result" id="result">
+
+      <!-- VIDEO -->
+      <div class="download-box">
+        <h3>🎬 Download Video (MP4)</h3>
+        <a id="videoLink" class="download-btn video" target="_blank">
+          ⬇️ Download Video
+        </a>
+      </div>
+
+      <!-- AUDIO -->
+      <div class="download-box">
+        <h3>🎧 Download Audio (MP3)</h3>
+        <a id="audioLink" class="download-btn audio" target="_blank">
+          ⬇️ Download Audio
+        </a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      Quantum YouTube Downloader • Powered by Pahri
+    </div>
+  </div>
+
+  <script>
+    async function downloadYT() {
+      const url = document.getElementById("ytUrl").value;
+      if (!url) return alert("Masukkan URL YouTube!");
+
+      const apiVideo = "https://api-faa.my.id/faa/ytmp4?url=" + encodeURIComponent(url);
+      const apiAudio = "https://api-faa.my.id/faa/ytmp3?url=" + encodeURIComponent(url);
+
+      try {
+        const resVideo = await fetch(apiVideo);
+        const videoData = await resVideo.json();
+
+        if (!videoData.status) return alert("Gagal mengambil video!");
+
+        document.getElementById("videoLink").href = videoData.result.download_url;
+
+        /* AUDIO (MP3) */
+        const resAudio = await fetch(apiAudio);
+        const audioData = await resAudio.json();
+
+        if (audioData.status) {
+          document.getElementById("audioLink").href = audioData.result.download_url;
+        }
+
+        document.getElementById("result").style.display = "block";
+
+      } catch (e) {
+        alert("Terjadi kesalahan!");
+      }
+    }
+  </script>
+
+</body>
+</html>

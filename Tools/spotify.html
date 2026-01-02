@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Spotify Player + Lyrics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1db954, #121212);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .player {
+      width: 100%;
+      max-width: 560px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(16px);
+      border-radius: 22px;
+      padding: 30px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      animation: fadeUp 1s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-bottom: 25px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 14px 22px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(135deg, #1db954, #1ed760);
+      color: #000;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    }
+
+    .result {
+      display: none;
+      animation: fadeUp 0.8s ease;
+    }
+
+    .cover {
+      width: 100%;
+      border-radius: 18px;
+      margin-bottom: 15px;
+    }
+
+    .song-title {
+      font-weight: 700;
+      font-size: 1.15rem;
+      margin-bottom: 5px;
+    }
+
+    .song-info {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      margin-bottom: 15px;
+    }
+
+    audio {
+      width: 100%;
+      margin-bottom: 15px;
+      border-radius: 10px;
+    }
+
+    .download {
+      display: block;
+      text-align: center;
+      padding: 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00ffcc, #00c3ff);
+      color: #000;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
+
+    /* ===== LYRICS ===== */
+    .lyrics-box {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 18px;
+      max-height: 260px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+
+    .lyrics-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-align: center;
+      opacity: 0.9;
+    }
+
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="player">
+    <h1>🎧 Spotify Player</h1>
+    <div class="subtitle">
+      Putar, download, dan nyanyi sambil baca lirik
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="query" placeholder="Judul lagu">
+      <button onclick="searchSong()">Cari Lagu</button>
+    </div>
+
+    <div class="result" id="result">
+      <img id="thumbnail" class="cover">
+
+      <div class="song-title" id="title"></div>
+      <div class="song-info" id="info"></div>
+
+      <audio id="audio" controls></audio>
+
+      <a id="download" class="download" target="_blank">
+        ⬇️ Download MP3
+      </a>
+
+      <!-- LYRICS -->
+      <div class="lyrics-title">🎤 Lirik Lagu</div>
+      <div class="lyrics-box" id="lyrics">
+        Memuat lirik...
+      </div>
+    </div>
+
+    <div class="footer">
+      Quantum Spotify Player • Powered by Pahri
+    </div>
+  </div>
+
+  <script>
+    async function searchSong() {
+      const q = document.getElementById("query").value;
+      if (!q) return alert("Masukkan judul lagu!");
+
+      const spotifyApi = "https://api-faa.my.id/faa/spotify-play?q=" + encodeURIComponent(q);
+      const lyricsApi = "https://api-faa.my.id/faa/lyrics?q=" + encodeURIComponent(q);
+
+      try {
+        // SPOTIFY
+        const res = await fetch(spotifyApi);
+        const data = await res.json();
+        if (!data.status) return alert("Lagu tidak ditemukan!");
+
+        document.getElementById("thumbnail").src = data.info.thumbnail;
+        document.getElementById("title").innerText = data.info.title;
+        document.getElementById("info").innerText =
+          data.info.artist + " • " +
+          data.info.album + " • " +
+          data.info.duration;
+
+        document.getElementById("audio").src = data.download.url;
+        document.getElementById("download").href = data.download.url;
+
+        // LYRICS
+        const lyr = await fetch(lyricsApi);
+        const lyrData = await lyr.json();
+
+        document.getElementById("lyrics").innerText =
+          lyrData.status ? lyrData.result.lyrics : "Lirik tidak ditemukan.";
+
+        document.getElementById("result").style.display = "block";
+
+      } catch (err) {
+        alert("Terjadi kesalahan!");
+      }
+    }
+  </script>
+
+</body>
+</html>
