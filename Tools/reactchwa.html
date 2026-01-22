@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>WA Channel Reaction Tool</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- REACT CDN -->
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#075E54,#128C7E,#25D366);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#fff;
+}
+.app{
+  width:100%;
+  max-width:430px;
+  background:rgba(0,0,0,.35);
+  backdrop-filter:blur(12px);
+  padding:30px;
+  border-radius:24px;
+  box-shadow:0 30px 70px rgba(0,0,0,.5);
+}
+h1{text-align:center}
+.subtitle{
+  text-align:center;
+  font-size:.9rem;
+  opacity:.85;
+  margin:8px 0 25px;
+}
+.group{margin-bottom:18px}
+label{font-size:.85rem}
+input{
+  width:100%;
+  margin-top:6px;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  outline:none;
+}
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(135deg,#25D366,#00e676);
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
+}
+button:disabled{opacity:.6}
+.result{
+  margin-top:20px;
+  padding:16px;
+  border-radius:16px;
+  background:rgba(255,255,255,.15);
+  font-size:.85rem;
+  word-break:break-word;
+}
+.success{color:#b8ffd9}
+.error{color:#ff9b9b}
+</style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+function App(){
+  const [url,setUrl] = React.useState("");
+  const [react,setReact] = React.useState("");
+  const [loading,setLoading] = React.useState(false);
+  const [result,setResult] = React.useState(null);
+  const [error,setError] = React.useState(null);
+
+  const sendReaction = async () => {
+    setLoading(true);
+    setResult(null);
+    setError(null);
+
+    try{
+      const apiUrl =
+        "https://api-faa.my.id/faa/react-channel" +
+        "?url=" + encodeURIComponent(url) +
+        "&react=" + encodeURIComponent(react);
+
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+
+      if(data.status !== true){
+        throw new Error(data.message || "Reaction gagal");
+      }
+
+      setResult(data);
+    }catch(err){
+      setError(err.message);
+    }finally{
+      setLoading(false);
+    }
+  };
+
+  return(
+    <div className="app">
+      <h1>💬 WA Channel Reaction</h1>
+      <div className="subtitle">GET API Version</div>
+
+      <div className="group">
+        <label>URL WhatsApp Channel</label>
+        <input
+          value={url}
+          onChange={e=>setUrl(e.target.value)}
+          placeholder="https://whatsapp.com/channel/xxxxx"
+        />
+      </div>
+
+      <div className="group">
+        <label>Reaction Emoji</label>
+        <input
+          value={react}
+          onChange={e=>setReact(e.target.value)}
+          placeholder="😹☝️🔥"
+        />
+      </div>
+
+      <button onClick={sendReaction} disabled={loading || !url || !react}>
+        {loading ? "Mengirim..." : "KIRIM REACTION"}
+      </button>
+
+      {result && (
+        <div className="result success">
+          <b>{result.message}</b><br/><br/>
+          Creator: {result.creator}<br/>
+          Reaction: {result.info.reaction_used}<br/>
+          <small>{result.info.destination}</small>
+        </div>
+      )}
+
+      {error && (
+        <div className="result error">
+          ERROR: {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
